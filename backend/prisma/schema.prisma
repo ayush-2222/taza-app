@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(cuid())
+  name              String
+  email             String?  @unique
+  passwordHash      String?
+  phoneNumber       String?  @unique @map("phone_number")
+  city              String?
+  state             String?
+  location          String?
+  role              String   @default("user")
+  preferredCategory String?  @map("preferred_category")
+  isGuest           Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  likes             Like[]
+
+  @@index([state])
+  @@index([role])
+  @@map("users")
+}
+
+model News {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  content     String
+  imageUrl    String
+  category    String
+  state       String
+  createdAt   DateTime @default(now())
+  likes       Like[]
+
+  @@index([category])
+  @@index([state])
+  @@index([createdAt(sort: Desc)])
+  @@map("news")
+}
+
+model Video {
+  id        String   @id @default(cuid())
+  title     String
+  videoUrl  String
+  thumbnail String
+  isLive    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([isLive])
+  @@map("videos")
+}
+
+model CitizenNews {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  state     String
+  language  String
+  imageUrl  String?
+  createdAt DateTime @default(now())
+
+  @@index([state])
+  @@index([createdAt(sort: Desc)])
+  @@map("citizen_news")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  newsId    String
+  createdAt DateTime @default(now())
+  news      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, newsId])
+  @@index([newsId])
+  @@map("likes")
+}

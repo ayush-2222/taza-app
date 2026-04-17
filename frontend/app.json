@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Taza App",
+    "slug": "taza-app",
+    "scheme": "tazaapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "icon": "./src/logo.png",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.taza.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./src/logo.png",
+        "backgroundColor": "#ffffff"
+      }
+    }
+  }
+}
