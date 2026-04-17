@@ -6,15 +6,13 @@
   "main": "dist/src/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && npm run build:seed",
+    "build:seed": "tsc --ignoreConfig prisma/seed.ts --outDir dist/prisma --module CommonJS --target ES2022 --moduleResolution Node --esModuleInterop --types node --ignoreDeprecations 6.0",
     "start": "node dist/src/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "node dist/prisma/seed.js",
     "render-build": "npm install && npx prisma generate && npm run build && npx prisma migrate deploy && npx prisma db seed"
-  },
-  "prisma": {
-    "seed": "node dist/prisma/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
