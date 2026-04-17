@@ -11,6 +11,7 @@ import { useAuthStore } from "@/store/authStore";
 import { userService } from "@/services/userService";
 import { RootStackParamList } from "@/navigation/types";
 import { UserRole } from "@/store/authStore";
+import { mobileEnv } from "@/config/env";
 
 type AuthResponse = {
   id?: string;
@@ -228,14 +229,24 @@ export function AuthScreen() {
             <Pressable onPress={handleSubmit} style={[styles.primaryButton, { backgroundColor: colors.primary }]}>
               <Text style={[styles.primaryText, { color: colors.backgroundAlt }]}>{isSignup ? "Sign up" : "Login"}</Text>
             </Pressable>
-            {!isSignup ? (
+            {!isSignup && (mobileEnv.demoLogin || mobileEnv.adminLogin) ? (
               <View style={styles.quickRow}>
-                <Pressable onPress={() => handleQuickLogin("demo@taza.app", "password123")} style={[styles.quickButton, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-                  <Text style={[styles.quickButtonText, { color: colors.text }]}>Demo login</Text>
-                </Pressable>
-                <Pressable onPress={() => handleQuickLogin("admin@gmail.com", "Admin@123")} style={[styles.quickButton, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-                  <Text style={[styles.quickButtonText, { color: colors.text }]}>Admin login</Text>
-                </Pressable>
+                {mobileEnv.demoLogin ? (
+                  <Pressable
+                    onPress={() => handleQuickLogin(mobileEnv.demoLogin!.identifier, mobileEnv.demoLogin!.password)}
+                    style={[styles.quickButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  >
+                    <Text style={[styles.quickButtonText, { color: colors.text }]}>Demo login</Text>
+                  </Pressable>
+                ) : null}
+                {mobileEnv.adminLogin ? (
+                  <Pressable
+                    onPress={() => handleQuickLogin(mobileEnv.adminLogin!.identifier, mobileEnv.adminLogin!.password)}
+                    style={[styles.quickButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  >
+                    <Text style={[styles.quickButtonText, { color: colors.text }]}>Admin login</Text>
+                  </Pressable>
+                ) : null}
               </View>
             ) : null}
             <Pressable onPress={handleGuestContinue}>

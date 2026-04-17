@@ -11,7 +11,7 @@ async function startServer() {
   initSocket(server);
 
   server.listen(env.PORT, "0.0.0.0", () => {
-    console.log(`Backend listening on http://192.168.0.138:${env.PORT}`);
+    console.log(`Backend listening on 0.0.0.0:${env.PORT}`);
   });
 
   const shutdown = async () => {

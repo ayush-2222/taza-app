@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
+import { mobileEnv } from "@/config/env";
 
 export const api = axios.create({
-  baseURL: "http://192.168.0.138:8000",
+  baseURL: mobileEnv.apiBaseUrl,
   timeout: 8000,
 });
 
@@ -22,3 +23,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (!mobileEnv.apiBaseUrl) {
+      error.message = "API base URL is not configured. Set EXPO_PUBLIC_API_BASE_URL before running the app.";
+    }
+
+    return Promise.reject(error);
+  }
+);
