@@ -3,7 +3,7 @@ services:
     name: taza-backend
     runtime: node
     rootDir: backend
-    buildCommand: npm install && npm run prisma:generate && npm run build
+    buildCommand: npm install --include=dev && npm run prisma:generate && npm run build
     preDeployCommand: npx prisma migrate deploy
     startCommand: npm run start
     healthCheckPath: /health
@@ -36,4 +36,3 @@ databases:
   - name: taza-postgres
     databaseName: taza_news
     postgresMajorVersion: "16"
-
