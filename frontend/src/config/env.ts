@@ -7,7 +7,8 @@ function normalizeUrl(value?: string) {
   return trimmed.replace(/\/+$/, "");
 }
 
-const apiBaseUrl = normalizeUrl(process.env.EXPO_PUBLIC_API_BASE_URL);
+const DEFAULT_API_BASE_URL = "https://taza-app.onrender.com";
+const apiBaseUrl = normalizeUrl(process.env.EXPO_PUBLIC_API_BASE_URL) ?? DEFAULT_API_BASE_URL;
 
 export const mobileEnv = {
   apiBaseUrl,
@@ -26,4 +27,3 @@ export const mobileEnv = {
         }
       : null
 };
-

@@ -2,9 +2,13 @@ import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import { mobileEnv } from "@/config/env";
 
+const BASE_URL = mobileEnv.apiBaseUrl;
+
+console.log("[api] Using base URL:", BASE_URL);
+
 export const api = axios.create({
-  baseURL: mobileEnv.apiBaseUrl,
-  timeout: 8000,
+  baseURL: BASE_URL,
+  timeout: 15000,
 });
 
 api.interceptors.request.use((config) => {
@@ -25,11 +29,5 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (!mobileEnv.apiBaseUrl) {
-      error.message = "API base URL is not configured. Set EXPO_PUBLIC_API_BASE_URL before running the app.";
-    }
-
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
