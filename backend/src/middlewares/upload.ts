@@ -4,31 +4,53 @@ import { Request } from "express";
 import multer, { StorageEngine } from "multer";
 import { env } from "../config/env";
 
-const citizenNewsRoot = path.resolve(process.cwd(), env.UPLOAD_DIR, "citizen-news");
-const imageUploadRoot = path.resolve(process.cwd(), env.UPLOAD_DIR, "images");
-const videoUploadRoot = path.resolve(process.cwd(), env.UPLOAD_DIR, "videos");
+function ensureWritableDirectory(candidate: string) {
+  fs.mkdirSync(candidate, { recursive: true });
+  fs.accessSync(candidate, fs.constants.W_OK);
+  return candidate;
+}
+
+function resolveUploadRoot() {
+  const preferredRoot = path.resolve(process.cwd(), env.UPLOAD_DIR);
+  const fallbackRoot = path.resolve(process.cwd(), "uploads");
+
+  try {
+    return ensureWritableDirectory(preferredRoot);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "EACCES" && (error as NodeJS.ErrnoException).code !== "EROFS") {
+      throw error;
+    }
+
+    const resolvedFallback = ensureWritableDirectory(fallbackRoot);
+    console.warn(`Upload directory "${preferredRoot}" is not writable. Falling back to "${resolvedFallback}".`);
+    return resolvedFallback;
+  }
+}
+
+export const uploadRoot = resolveUploadRoot();
+
+const citizenNewsRoot = path.join(uploadRoot, "citizen-news");
+const imageUploadRoot = path.join(uploadRoot, "images");
+const videoUploadRoot = path.join(uploadRoot, "videos");
 
 [citizenNewsRoot, imageUploadRoot, videoUploadRoot].forEach((dir) => fs.mkdirSync(dir, { recursive: true }));
+
+function createFilename(_req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
+  const sanitized = file.originalname.replace(/\s+/g, "-").toLowerCase();
+  cb(null, `${Date.now()}-${sanitized}`);
+}
 
 const citizenNewsStorage = multer.diskStorage({
   destination: (_req: Request, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) =>
     cb(null, citizenNewsRoot),
-  filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-    void req;
-    const sanitized = file.originalname.replace(/\s+/g, "-").toLowerCase();
-    cb(null, `${Date.now()}-${sanitized}`);
-  }
+  filename: createFilename
 });
 
 function createDiskStorage(destination: string): StorageEngine {
   return multer.diskStorage({
     destination: (_req: Request, _file: Express.Multer.File, cb: (error: Error | null, folder: string) => void) =>
       cb(null, destination),
-    filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-      void req;
-      const sanitized = file.originalname.replace(/\s+/g, "-").toLowerCase();
-      cb(null, `${Date.now()}-${sanitized}`);
-    }
+    filename: createFilename
   });
 }
 
